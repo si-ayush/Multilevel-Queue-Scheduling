@@ -292,7 +292,7 @@ int main() {
     }
     process_Q[i].total_time = t;
     //cout << "Time taken for queue " << i + 1 << " to execute: " << process_Q[i].total_time << "\n";
-    //cout << "\n";
+    cout << "\n";
   }
 
   int sum_tt = 0;
