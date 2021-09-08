@@ -30,18 +30,18 @@ bool notComplete(queues process_Q[]) {
   bool ans = false;
   int countInc = 0;
 
-  for (int i = 0; i < num_queue; i++) {
+  for (int i = 0; i < num_queue; i++) { // check for each queue if all the process are executed or not
     countInc = 0;
     for (int j = 0; j < process_Q[i].length; j++) {
       if (process_Q[i].proc[j].burst_time != 0) {
         ans = true;
       } else {
-        countInc++;
+        countInc++; // count processes which are done executing ie burst time = 0
       }
     }
 
     if (countInc == process_Q[i].length)
-      process_Q[i].executed = true;
+      process_Q[i].executed = true; // iff all the processes are executed then "executed" of the queue is set to true
   }
 
   return ans;
@@ -50,7 +50,7 @@ bool notComplete(queues process_Q[]) {
 void checkCompleteTimer(queues process_Q[]) {
   bool ans = notComplete(process_Q);
   for (int i = 0; i < num_queue; i++) {
-    if (process_Q[i].executed == false) {
+    if (process_Q[i].executed == false) { // some processes in queue require to execute
       for (int j = 0; j < process_Q[i].length; j++) {
         if (process_Q[i].proc[j].burst_time != 0) {
           process_Q[i].proc[j].total_time += 1;
@@ -65,14 +65,16 @@ void checkCompleteTimer(queues process_Q[]) {
 void roundRobin(queues process_Q[], int & rr_time, int & counterRR, int & timer) {
   int l = queue_type;
   for (int i = 0; i < process_Q[l].length; i++) {
+    // if the process within the queue is done updating increment the counter
     if (process_Q[l].proc[i].burst_time == 0) {
       counterRR++;
       continue;
     }
-
+    //Queue 1 is done executing
     if (counterRR == process_Q[l].length)
       return;
 
+    // keep exectuing the process untill its done executing or overall timer equals 10
     while (rr_time > 0 && process_Q[l].proc[i].burst_time != 0 && timer != 10) {
       cout << "Executing queue 1 and " << i + 1 << " process for a unit time. Process has priority of " << process_Q[l].proc[i].priority << "\n";
       process_Q[l].proc[i].burst_time--;
@@ -81,22 +83,24 @@ void roundRobin(queues process_Q[], int & rr_time, int & counterRR, int & timer)
       timer++;
     }
 
+    // Overall round robin with TQ of 10 ie every queue will execute for 10 units of time.
     if (timer == 10)
       return;
-
+    // Updating the TQ of the queue 1 ( TQ of 4 is used here)
     if (rr_time == 0)
       rr_time = 4;
 
     if (process_Q[l].proc[i].burst_time == 0) {
+      // if at the last process of the queue and its done executing go to the first process
       if (i == process_Q[l].length - 1)
-        i--;
+        i =-1;
       continue;
     }
 
     if (rr_time <= 0) {
       rr_time = 4;
       if (i == process_Q[l].length - 1)
-        i--;
+        i = -1;
       continue;
     }
   }
@@ -202,17 +206,18 @@ int main() {
 
     for (int j = 0; j < num_queue; j++) {
       if (process_Q[j].pri_start <= p[i].priority && p[i].priority <= process_Q[j].pri_end) {
-        process_Q[j].length++;
+        process_Q[j].length++; // increase the size of the queue according to the number of processes for that queue
       }
     }
   }
 
   for (int i = 0; i < num_queue; i++) {
-    process_Q[i].proc = new process[process_Q[i].length];
+    process_Q[i].proc = new process[process_Q[i].length]; // creating process array for the queues
   }
 
   int a = 0, b = 0, c = 0;
 
+  // Assign the input process to their queue. Inside queue they are copied to the process array.
   for (int i = 0; i < num_queue; i++) {
     for (int j = 0; j < total_proc; j++) {
       if ((process_Q[i].pri_start <= p[j].priority) && (p[j].priority <= process_Q[i].pri_end)) {
@@ -227,6 +232,7 @@ int main() {
     }
   }
 
+  //State of the queue ie the contents of the queue at the start
   for (int i = 0; i < num_queue; i++) {
     cout << "Queue" << i + 1 << " : \t";
     for (int j = 0; j < process_Q[i].length; j++) {
@@ -239,7 +245,7 @@ int main() {
   int timer = 0; // time Quantum of 10 will be used for all queues scheduling
 
   //int queue_type = -1; // QUEUE Type
-  int rr_time = 4; // Time quantum for Round Robin
+  int rr_time = 4; // Time quantum for Round Robin on queue 1
 
   int counterRR = 0;
   int counterPS = 0;
@@ -291,7 +297,7 @@ int main() {
       t += process_Q[i].proc[j].total_time;
     }
     process_Q[i].total_time = t;
-    //cout << "Time taken for queue " << i + 1 << " to execute: " << process_Q[i].total_time << "\n";
+    cout << "Time taken for queue " << i + 1 << " to execute: " << process_Q[i].total_time << "\n";
     cout << "\n";
   }
 
